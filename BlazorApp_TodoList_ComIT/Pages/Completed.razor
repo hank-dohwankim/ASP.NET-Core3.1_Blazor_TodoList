@@ -1,0 +1,65 @@
+﻿@page "/completed"
+@using BlazorApp_TodoList_ComIT.Models
+@using BlazorApp_TodoList_ComIT.Service
+
+@inherits OwningComponentBase<TodoService>
+
+<h5>TodoList</h5>
+
+@if (Service != null)
+{
+    @*<input placeholder="Add a task in to the To Do List" @bind="newTodo" @onkeyup="AddTodo" />*@
+    <table>
+        @foreach (var todo in todos)
+        {
+            if (todo.IsChecked)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" @bind="@todo.IsChecked" @onclick="async eventArgs => { await CheckTodo(todo); }" />
+                    </td>
+                    <td>@todo.Content</td>
+                </tr>
+            }
+        }
+    </table>
+}
+
+@code {
+
+    private IEnumerable<Todo> todos = new List<Todo>();
+    public string newTodo { get; set; }
+
+    protected override void OnInitialized()
+    {
+        todos = Service.GetTodos();
+    }
+
+    //protected async Task AddTodo(KeyboardEventArgs e)
+    //{
+    //    if (e.Key == "Enter")
+    //    {
+    //        if (!string.IsNullOrWhiteSpace(newTodo))
+    //        {
+    //            var result = false;
+
+    //            var todo = new Todo { Content = newTodo };
+    //            result = await Service.CreatTodo(todo);
+    //            newTodo = string.Empty;
+    //        }
+    //    }
+    //    OnInitialized();
+    //}
+
+    protected async Task CheckTodo(Todo todo)
+    {
+        var result = false;
+
+        if (todo.IsChecked == true)
+        {
+            var updateTodo = new Todo { Id = todo.Id, Content = todo.Content, IsChecked = false };
+
+            result = await Service.UpdateTodo(updateTodo);
+        }
+    }
+}
